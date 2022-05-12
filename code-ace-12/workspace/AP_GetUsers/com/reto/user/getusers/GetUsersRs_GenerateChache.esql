@@ -1,0 +1,27 @@
+BROKER SCHEMA com.reto.user.getusers
+
+CREATE COMPUTE MODULE GetUsersRs_GenerateChache
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.Properties.CodedCharSetId = 1208;
+		SET OutputRoot.MQMD.CodedCharSetId = 1208;
+		SET OutputRoot.MQMD.Encoding = 273;
+		SET OutputRoot.MQMD.Format = MQFMT_STRING;
+		
+		--TODO: UDP para los datos de conexión de Redis
+		SET OutputRoot.JSON.Data.config.host = 'host.docker.internal';
+		SET OutputRoot.JSON.Data.config.port = 6379;
+		
+		DECLARE i INTEGER 1;
+		FOR user AS InputRoot.JSON.Data.[] DO
+			CREATE FIELD OutputRoot.JSON.Data.data IDENTITY(JSON.Array)data;
+			SET OutputRoot.JSON.Data.data.Item[i].key = user.email;
+			SET OutputRoot.JSON.Data.data.Item[i].value = user;
+		SET i = i + 1;
+		END FOR;
+		
+		RETURN TRUE;
+	END;
+END MODULE;

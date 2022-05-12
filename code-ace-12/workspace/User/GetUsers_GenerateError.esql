@@ -1,0 +1,16 @@
+
+
+
+CREATE COMPUTE MODULE GetUsers_GenerateError
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = InputRoot.MQMD.MsgId;
+		CREATE LASTCHILD OF OutputRoot DOMAIN 'JSON';
+		SET OutputRoot.JSON.Data.code = ERROR_500;
+		--TODO: Implementar función para tomar último hijo y enviar el detalle del error
+		SET OutputRoot.JSON.Data.message = MSG_ERROR_500;
+		SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = ERROR_500;		
+		RETURN TRUE;
+	END;
+END MODULE;

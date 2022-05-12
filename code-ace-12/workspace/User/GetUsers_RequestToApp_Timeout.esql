@@ -1,0 +1,25 @@
+
+
+CREATE COMPUTE MODULE GetUsers_Timeout
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyMessageHeaders();
+		SET OutputRoot.HTTPReplyHeader."Content-Type" = 'application/json; charset=utf-8';
+		
+		CREATE LASTCHILD OF OutputRoot.JSON DOMAIN ('JSON') NAME 'Data';
+		SET OutputRoot.JSON.Data.code = '504';
+		SET OutputRoot.JSON.Data.message = 'Timeout';  
+		SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode = '504';
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+END MODULE;

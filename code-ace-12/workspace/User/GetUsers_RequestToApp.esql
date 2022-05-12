@@ -1,0 +1,19 @@
+
+
+
+CREATE COMPUTE MODULE GetUsers_RequestToApp
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties       = InputRoot.Properties;
+		SET OutputRoot.MQMD.Report		= MQRO_PASS_MSG_ID;
+		SET OutputRoot.MQMD.MsgId		= InputLocalEnvironment.Destination.HTTP.RequestIdentifier;
+		SET OutputRoot.MQMD.ReplyToQ	= REPLY_Q;
+		SET OutputRoot.MQMD.Expiry 		= MSG_EXPIRY;
+		
+		DECLARE inBody REFERENCE TO InputLocalEnvironment.REST.Input.Parameters;
+		
+		CREATE FIELD OutputRoot.JSON.Data.Params;
+		SET OutputRoot.JSON.Data.Params.id = inBody.id;
+		SET OutputRoot.JSON.Data.Params.email = inBody.email;	
+	END;
+END MODULE;

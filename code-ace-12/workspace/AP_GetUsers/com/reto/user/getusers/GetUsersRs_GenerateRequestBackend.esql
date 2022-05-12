@@ -1,0 +1,13 @@
+BROKER SCHEMA com.reto.user.getusers
+
+CREATE COMPUTE MODULE GetUsersRs_GenerateRequestBackend
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputRoot.Properties;  
+		SET OutputLocalEnvironment.Destination.HTTP.RequestURL = ENDPOINT_BACKEND;
+		SET OutputLocalEnvironment.Destination.HTTP.Timeout = BACKEND_TIMEOUT;
+		--TODO: Implementar función para guardar la cabecera MQMD en el UserContext para no perder el ReplyToQ
+		SET OutputLocalEnvironment.Destination.HTTP.UserContext = InputRoot.MQMD.MsgId;
+		RETURN TRUE;
+	END;
+END MODULE;

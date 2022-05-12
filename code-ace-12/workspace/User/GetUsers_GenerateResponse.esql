@@ -1,0 +1,23 @@
+
+
+
+CREATE COMPUTE MODULE GetUsers_GenerateResponse
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputLocalEnvironment.Destination.HTTP.RequestIdentifier = InputRoot.MQMD.CorrelId;
+		
+		DECLARE code INTEGER CAST(InputRoot.JSON.Data.code AS INTEGER);
+		
+		--TODO Implementar lógica para validar escenarios de errror de negocio del backend
+		IF (code IS NULL)  THEN
+			SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode   = '200';
+		ELSEIF (code > 299 AND code < 500) THEN
+			SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode   = '400';
+		ELSE
+			SET OutputLocalEnvironment.Destination.HTTP.ReplyStatusCode   = ERROR_500;
+		END IF;
+		SET OutputRoot.JSON = InputRoot.JSON;
+		RETURN TRUE;
+	END;
+END MODULE;

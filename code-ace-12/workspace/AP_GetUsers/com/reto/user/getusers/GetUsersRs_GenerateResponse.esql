@@ -1,0 +1,17 @@
+BROKER SCHEMA com.reto.user.getusers
+
+
+CREATE COMPUTE MODULE GetUsersRs_GenerateResponse
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		SET OutputRoot.Properties = InputRoot.Properties;
+		SET OutputRoot.MQMD.CodedCharSetId = 819;
+		SET OutputRoot.MQMD.Encoding = 273;
+		SET OutputRoot.Properties.CodedCharSetId = 819;
+		SET OutputRoot.Properties.Encoding = 273;
+		--TODO: Implementar función para obtener la cabecera MQMD guardada en el UserContext
+		SET OutputRoot.MQMD.ReplyToQ = REPLY_Q;
+		SET OutputRoot.MQMD.MsgId = InputLocalEnvironment.HTTP.Response.UserContext;
+		SET OutputRoot.JSON.Data = InputRoot.JSON.Data;
+	END;
+END MODULE;
